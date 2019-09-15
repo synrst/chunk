@@ -1,0 +1,89 @@
+.TH chunk 1 "February 2018" "user manual"
+.SH NAME
+.PP
+chunk - Copies a chunk of data as specified by the offset and length.
+.SH SYNOPSIS
+.PP
+chunk [options]
+.SH DESCRIPTION
+.PP
+This is a simple program for reading and writing data, with the ability
+to specify a starting offset position and a maximum length.
+.PP
+It will start reading the first byte at position 0 by default.
+If the starting offset position is set with the \f[B]-p\f[] option, it
+will skip the specified bytes by using lseek() (if and when supported)
+to jump to that position in the input, or by reading and discarding the
+specified number of bytes.
+.PP
+If the input continues to provide data, it will continue to read and
+write data until end-of-file (EOF) is reached.
+If the maximum length is set with the \f[B]-l\f[] option, it will read
+at most the specified number of bytes from the starting offset position.
+If there are less bytes in the input, it will only read the data that
+is available up until EOF.
+.PP
+The internal buffer used to read and write data is allocated at program
+runtime.
+The default size of this buffer is 256 KB, and can be changed to an
+exact value with the \f[B]-b\f[] option.
+.PP
+The default input file is STDIN and the default output file is STDOUT.
+These can be changed with the \f[B]-f\f[] and \f[B]-o\f[] options
+respectively.
+.PP
+This program also supports hexadecimal values for the parameters.
+Any of the numeric parameters can be prepended with \f[B]0x\f[] to
+indicate that the value is hexadecimal.
+.SH OPTIONS
+.TP
+.B -p \f[I]offset\f[]
+Sets the starting offset position to begin reading data.
+The default is 0, indicating that it will start at the beginning.
+Hexadecimal values prepended with \f[B]0x\f[] are valid.
+Suffixes are not supported, so the value must be exact.
+.RS
+.RE
+.TP
+.B -l \f[I]length\f[]
+Sets the maximum length of bytes to copy.
+The default is -1, indicating that it will read data until EOF.
+Hexadecimal values prepended with \f[B]0x\f[] are valid.
+Suffixes are not supported, so the value must be exact.
+.RS
+.RE
+.TP
+.B -f \f[I]file_in\f[]
+Sets the input file.
+The default is STDIN.
+.RS
+.RE
+.TP
+.B -o \f[I]file_out\f[]
+Sets the output file.
+The default is STDOUT.
+.RS
+.RE
+.TP
+.B -b \f[I]buf_size\f[]
+Sets the buffer size.
+The default is 262144 bytes.
+Hexadecimal values prepended with \f[B]0x\f[] are valid.
+Suffixes are not supported, so the value must be exact.
+.SH LICENSE
+.PP
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+.PP
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+.PP
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+.SH COPYRIGHT
+.PP
+Copyright (C) 2005,2017-2018 Christopher J. Dunkle

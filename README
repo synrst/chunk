@@ -1,0 +1,47 @@
+DESCRIPTION
+
+chunk is a simple program for reading and writing data, with the ability
+to specify a starting offset position and a maximum length.
+
+CHANGES
+
+0.00 - 2005-10-13
+	- Changed byte indicators to use ssize_t to allow larger
+	  positions and lengths.
+
+0.01 - 2017-12-23
+	- Added the -b option to dynamically allocate the buffer.
+	- First publicly released version.
+
+0.02 - 2018-02-03
+	- Reverted a bug that incorrectly set and compared the length.
+	- Changed input parameters to use size_t for larger values.
+	- Changed total size to unsigned to prevent infinite loops.
+
+COMPILING
+
+A simple Makefile has been provided to compile and install this program
+on Linux systems. A different compiling procedure may be required on
+other system types. To compile on a Linux systems, simply execute the
+following. Other options to `make` install uninstall, clean, and opt.
+
+	make && sudo make install
+
+LICENSE
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+COPYRIGHT
+
+Copyright (C) 2005,2017-2018 Christopher J. Dunkle
