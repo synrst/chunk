@@ -7,9 +7,13 @@
 #include <stdlib.h>		// strtoull(), exit(), malloc(), free()
 #include <errno.h>		// errno
 
+#define CODE_VERSION		"0.03"
+#define CODE_DATE		"2020-02-02"
+
 /**********************************************************/
 
 void usage(char* program) {
+	fprintf(stderr, "chunk %s released %s\n", CODE_VERSION, CODE_DATE);
 	fprintf(stderr, "Usage: %s [options]\n", program);
 	fprintf(stderr, "Copies a chunk of data as specified by the offset and length.\n");
 	fprintf(stderr, "Hexadecimal values (prepended with 0x) are valid.\n");
