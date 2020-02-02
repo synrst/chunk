@@ -1,7 +1,11 @@
 DESCRIPTION
 
 chunk is a simple program for reading and writing data, with the ability
-to specify a starting offset position and a maximum length.
+to specify a starting offset position in the input, a seek position in
+the output, and a maximum length of bytes to copy. This program may be
+considered similar to dd, but the positions are exact and not dependent
+on the block size of data copied. It also buffers a large amount of
+data with each read and write to make the copy more efficient.
 
 CHANGES
 
@@ -17,6 +21,10 @@ CHANGES
 	- Reverted a bug that incorrectly set and compared the length.
 	- Changed input parameters to use size_t for larger values.
 	- Changed total size to unsigned to prevent infinite loops.
+
+0.03 - 2020-02-02
+	- Added the -s option to seek a position in the output file.
+	- Do not truncate the output file when seek is used.
 
 COMPILING
 
@@ -44,4 +52,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 COPYRIGHT
 
-Copyright (C) 2005,2017-2018 Christopher J. Dunkle
+Copyright (C) 2005,2017-2018,2020 Christopher J. Dunkle

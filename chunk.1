@@ -1,4 +1,4 @@
-.TH chunk 1 "February 2018" "user manual"
+.TH chunk 1 "February 2020" "user manual"
 .SH NAME
 .PP
 chunk - Copies a chunk of data as specified by the offset and length.
@@ -8,13 +8,25 @@ chunk [options]
 .SH DESCRIPTION
 .PP
 This is a simple program for reading and writing data, with the ability
-to specify a starting offset position and a maximum length.
+to specify a starting offset position in the input, a seek position in
+the output, and a maximum length of bytes to copy.
+This program may be considered similar to dd, but the positions are
+exact and not dependent on the block size of data copied.
+It also buffers a large amount of data with each read and write to make
+the copy more efficient.
 .PP
-It will start reading the first byte at position 0 by default.
+It will read the first byte at position 0 of the input by default.
 If the starting offset position is set with the \f[B]-p\f[] option, it
 will skip the specified bytes by using lseek() (if and when supported)
 to jump to that position in the input, or by reading and discarding the
 specified number of bytes.
+.PP
+It will write the first byte at position 0 of the output by default.
+If the seek position is set with the \f[B]-s\f[] option, it will seek
+to the specified byte by using lseek() to jump to that position in the
+output.
+This option is only supported when the \f[B]-o\f[] option is used to
+specify an output file, and cannot be used with STDOUT.
 .PP
 If the input continues to provide data, it will continue to read and
 write data until end-of-file (EOF) is reached.
@@ -42,6 +54,21 @@ Sets the starting offset position to begin reading data.
 The default is 0, indicating that it will start at the beginning.
 Hexadecimal values prepended with \f[B]0x\f[] are valid.
 Suffixes are not supported, so the value must be exact.
+.RS
+.RE
+.TP
+.B -s \f[I]seek\f[]
+Sets the seek position to begin writing data.
+The default is 0, indicating that it will start at the beginning.
+Hexadecimal values prepended with \f[B]0x\f[] are valid.
+Suffixes are not supported, so the value must be exact.
+.IP
+This option must be used with the \f[B]-o\f[] option, since lseek() is
+not supported with STDOUT.
+This option also removes the O_TRUNC flag when open() is called to
+prevent truncating the output file.
+Explicitly setting this option to 0 will not truncate the output file
+when starting at position 0.
 .RS
 .RE
 .TP
@@ -86,4 +113,4 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 .SH COPYRIGHT
 .PP
-Copyright (C) 2005,2017-2018 Christopher J. Dunkle
+Copyright (C) 2005,2017-2018,2020 Christopher J. Dunkle

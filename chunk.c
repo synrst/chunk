@@ -14,7 +14,8 @@ void usage(char* program) {
 	fprintf(stderr, "Copies a chunk of data as specified by the offset and length.\n");
 	fprintf(stderr, "Hexadecimal values (prepended with 0x) are valid.\n");
 	fprintf(stderr, "    Options:\n");
-	fprintf(stderr, "        -p offset   : sets the offset position (default is 0)\n");
+	fprintf(stderr, "        -p offset   : sets the offset position of the input (default is 0)\n");
+	fprintf(stderr, "        -s seek     : sets the seek position of the output (default is 0)\n");
 	fprintf(stderr, "        -l length   : sets maximum length to copy (default is until EOF)\n");
 	fprintf(stderr, "        -f file_in  : sets the input file (default is STDIN)\n");
 	fprintf(stderr, "        -o file_out : sets the output file (default is STDOUT)\n");
@@ -36,14 +37,19 @@ int main(int argc, char* argv[]) {
 	// options
 	char opt;
 	size_t offset = 0;
+	size_t seek = 0;
 	size_t length = -1;	// EOF (unsigned maximum)
 	char* file_in = NULL;
 	char* file_out = NULL;
 	size_t buf_size = 262144;
 
+	// file descriptor flags
+	int in_flags = O_RDONLY;
+	int out_flags = O_WRONLY | O_CREAT | O_TRUNC;
+
 	// check options
 	opterr = 0;
-	while ((opt = getopt(argc, argv, "p:l:f:o:b:")) != -1) {
+	while ((opt = getopt(argc, argv, "p:s:l:f:o:b:")) != -1) {
 		switch(opt) {
 
 			case 'p':	// offset
@@ -53,6 +59,21 @@ int main(int argc, char* argv[]) {
 				else {
 					offset = strtoull(optarg, 0, 10);
 				}
+				break;
+
+			case 's':	// seek
+				if (strncmp(optarg, "0x", 2) == 0) {
+					seek = strtoull(optarg + 2, 0, 16);
+				}
+				else {
+					seek = strtoull(optarg, 0, 10);
+				}
+
+				// disable truncating the output file
+				if (out_flags & O_TRUNC) {
+					out_flags ^= O_TRUNC;
+				}
+
 				break;
 
 			case 'l':	// length
@@ -91,6 +112,12 @@ int main(int argc, char* argv[]) {
 	// invalid arguments
 	if (optind != argc) usage(argv[0]);
 
+	// cannot seek with STDOUT
+	if (file_out == NULL && seek > 0) {
+		fprintf(stderr, "Cannot seek when STDOUT is output file\n");
+		exit(EPERM);
+	}
+
 	// allocate memory
 	buf = (unsigned char*)malloc((size_t)buf_size);
 	if (buf == NULL) {
@@ -98,9 +125,9 @@ int main(int argc, char* argv[]) {
 		exit(errno);
 	}
 
-	// open input file
+	// open input file, or STDIN if not defined
 	if (file_in != NULL) {
-		fdin = open(file_in, O_RDONLY, 0666);
+		fdin = open(file_in, in_flags, 0666);
 		if (fdin < 0) {
 			fprintf(stderr, "Could not open input file\n");
 			exit(errno);
@@ -110,9 +137,9 @@ int main(int argc, char* argv[]) {
 		fdin = fileno(stdin);
 	}
 
-	// open output file
+	// open output file, or STDOUT if not defined
 	if (file_out != NULL) {
-		fdout = open(file_out, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+		fdout = open(file_out, out_flags, 0666);
 		if (fdout < 0) {
 			fprintf(stderr, "Could not open output file\n");
 			exit(errno);
@@ -122,7 +149,7 @@ int main(int argc, char* argv[]) {
 		fdout = fileno(stdout);
 	}
 
-	// seek to position
+	// seek to input position
 	if (lseek(fdin, offset, SEEK_SET) == -1) {
 		// lseek() doesn't work on STDIN
 		size = 0;
@@ -141,6 +168,14 @@ int main(int argc, char* argv[]) {
 				exit(0);
 			}
 			size += bytes_read;
+		}
+	}
+
+	// seek to output position
+	if (seek > 0) {
+		if (lseek(fdout, seek, SEEK_SET) == -1) {
+			fprintf(stderr, "Could not seek output file\n");
+			exit(errno);
 		}
 	}
 
