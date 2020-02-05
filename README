@@ -30,8 +30,8 @@ COMPILING
 
 A simple Makefile has been provided to compile and install this program
 on Linux systems. A different compiling procedure may be required on
-other system types. To compile on a Linux systems, simply execute the
-following. Other options to `make` install uninstall, clean, and opt.
+other system types. To compile on a Linux system, simply execute the
+following. Other options to `make` include uninstall, clean, and opt.
 
 	make && sudo make install
 
