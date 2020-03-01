@@ -7,8 +7,8 @@
 #include <stdlib.h>		// strtoull(), exit(), malloc(), free()
 #include <errno.h>		// errno
 
-#define CODE_VERSION		"0.03"
-#define CODE_DATE		"2020-02-02"
+#define CODE_VERSION		"0.04"
+#define CODE_DATE		"2020-02-29"
 
 /**********************************************************/
 
@@ -21,6 +21,7 @@ void usage(char* program) {
 	fprintf(stderr, "        -p offset   : sets the offset position of the input (default is 0)\n");
 	fprintf(stderr, "        -s seek     : sets the seek position of the output (default is 0)\n");
 	fprintf(stderr, "        -l length   : sets maximum length to copy (default is until EOF)\n");
+	fprintf(stderr, "        -e offset   : sets the end position of the input (to calculate length)\n");
 	fprintf(stderr, "        -f file_in  : sets the input file (default is STDIN)\n");
 	fprintf(stderr, "        -o file_out : sets the output file (default is STDOUT)\n");
 	fprintf(stderr, "        -b size     : sets the I/O buffer size (default is 262144)\n");
@@ -41,6 +42,7 @@ int main(int argc, char* argv[]) {
 	// options
 	char opt;
 	size_t offset = 0;
+	size_t end = -1;	// EOF (unsigned maximum)
 	size_t seek = 0;
 	size_t length = -1;	// EOF (unsigned maximum)
 	char* file_in = NULL;
@@ -53,10 +55,10 @@ int main(int argc, char* argv[]) {
 
 	// check options
 	opterr = 0;
-	while ((opt = getopt(argc, argv, "p:s:l:f:o:b:")) != -1) {
+	while ((opt = getopt(argc, argv, "p:s:l:e:f:o:b:")) != -1) {
 		switch(opt) {
 
-			case 'p':	// offset
+			case 'p':	// offset position
 				if (strncmp(optarg, "0x", 2) == 0) {
 					offset = strtoull(optarg + 2, 0, 16);
 				}
@@ -86,6 +88,15 @@ int main(int argc, char* argv[]) {
 				}
 				else {
 					length = strtoull(optarg, 0, 10);
+				}
+				break;
+
+			case 'e':	// ending position
+				if (strncmp(optarg, "0x", 2) == 0) {
+					end = strtoull(optarg + 2, 0, 16);
+				}
+				else {
+					end = strtoull(optarg, 0, 10);
 				}
 				break;
 
@@ -120,6 +131,28 @@ int main(int argc, char* argv[]) {
 	if (file_out == NULL && seek > 0) {
 		fprintf(stderr, "Cannot seek when STDOUT is output file\n");
 		exit(EPERM);
+	}
+
+	// end and length are exclusive options
+	if (end != (size_t)-1 && length != (size_t)-1) {
+		fprintf(stderr, "Incompatible options (-e and -l)\n");
+		exit(EINVAL);
+	}
+
+	// calculate length based on end position
+	if (end != (size_t)-1) {
+
+		// verify positions
+		if (end < offset) {
+			fprintf(stderr, "Illegal end position\n");
+			exit(EINVAL);
+		}
+
+		// length is inclusive (plus one)
+		length = (end - offset) + 1;
+
+		// NOTE: do no need to check for overflow because greatest
+		// value for end is one less than the maximum (-1)
 	}
 
 	// allocate memory

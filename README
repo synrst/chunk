@@ -26,6 +26,10 @@ CHANGES
 	- Added the -s option to seek a position in the output file.
 	- Do not truncate the output file when seek is used.
 
+0.04 - 2020-02-29
+	- Added the -e option to set the ending offset position to
+	  calculate the length of bytes to copy.
+
 COMPILING
 
 A simple Makefile has been provided to compile and install this program

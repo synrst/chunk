@@ -77,6 +77,21 @@ Sets the maximum length of bytes to copy.
 The default is -1, indicating that it will read data until EOF.
 Hexadecimal values prepended with \f[B]0x\f[] are valid.
 Suffixes are not supported, so the value must be exact.
+This option is exclusive of the \f[B]-e\f[] option, which sets the
+ending offset position instead of the length.
+.RS
+.RE
+.TP
+.B -e \f[I]offset\f[]
+Sets the ending offset position to stop reading data.
+This value is used to calculate the length in place of the \f[B]-l\f[]
+option, such that the length is the ending offset position (\f[B]-e\f[])
+minus the starting offset position (\f[B]-p\f[]) plus one to make the
+range inclusive.
+Hexadecimal values prepended with \f[B]0x\f[] are valid.
+Suffixes are not supported, so the value must be exact.
+This option is exclusive of the \f[B]-l\f[] option, which sets the
+length of bytes to copy instead of the ending offset position.
 .RS
 .RE
 .TP
